@@ -61,7 +61,7 @@ var (
 type oidcHandler struct {
 	log        telemetry.Logger
 	config     *oidcv1.OIDCConfig
-	tlsPool    internal.TLSConfigPool
+	tlsPool    inthttp.TLSConfigPool
 	jwks       oidc.JWKSProvider
 	sessions   oidc.SessionStoreFactory
 	sessionGen oidc.SessionGenerator
@@ -70,7 +70,7 @@ type oidcHandler struct {
 }
 
 // NewOIDCHandler creates a new OIDC implementation of the Handler interface.
-func NewOIDCHandler(cfg *oidcv1.OIDCConfig, tlsPool internal.TLSConfigPool, jwks oidc.JWKSProvider,
+func NewOIDCHandler(cfg *oidcv1.OIDCConfig, tlsPool inthttp.TLSConfigPool, jwks oidc.JWKSProvider,
 	sessions oidc.SessionStoreFactory, clock oidc.Clock, sessionGen oidc.SessionGenerator) (Handler, error) {
 
 	client, err := inthttp.NewHTTPClient(cfg, tlsPool, internal.Logger(internal.IDP))
@@ -553,7 +553,7 @@ func (o *oidcHandler) refreshToken(ctx context.Context, log telemetry.Logger, ex
 	}
 
 	// validate the id token
-	if ok, _ := o.isValidIDToken(context.Background(), log, newTokenResponse.IDToken, expectedNonce, false); !ok {
+	if ok, _ := o.isValidIDToken(ctx, log, newTokenResponse.IDToken, expectedNonce, false); !ok {
 		return nil
 	}
 
